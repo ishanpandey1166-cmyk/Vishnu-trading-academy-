@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vishnu Trading Academy</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#050806;--card:#0c120e;--line:#1b2a20;--g:#22e07a;--t:#e8efe9;--m:#8a9b8f;--r:#ff5a5f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--t);font:15px/1.55 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+header b{color:var(--g);font-size:17px}header small{color:var(--m)}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5}
+nav button{flex:none}
+button,select,input,textarea{font:inherit;background:#0a0f0c;color:var(--t);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+button{cursor:pointer}button:hover,button.on{border-color:var(--g);color:var(--g)}
+button.pri{background:var(--g);color:#031;border-color:var(--g);font-weight:700}
+main{max-width:1050px;margin:auto;padding:16px}
+h2{margin:4px 0 12px;font-size:20px}h3{margin:0 0 8px;font-size:15px;color:var(--g)}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.k{font-size:24px;font-weight:700}.m{color:var(--m);font-size:13px}.g{color:var(--g)}.r{color:var(--r)}
+.bar{height:8px;background:#14201a;border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--g)}
+form{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}form .w{grid-column:1/-1}
+label{font-size:12px;color:var(--m);display:flex;flex-direction:column;gap:3px}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}summary{cursor:pointer;font-weight:700}
+.demo{color:#ffd24a;font-size:11px;border:1px solid #ffd24a;border-radius:4px;padding:1px 5px}
+footer{color:var(--m);font-size:12px;padding:16px;border-top:1px solid var(--line);text-align:center}
+canvas{max-height:260px}svg{width:100%;height:auto;background:#070c09;border-radius:6px}
+</style></head><body>
+<header><b>▲ Vishnu Trading Academy</b><small>educational terminal</small></header>
+<nav id="nav"></nav><main id="main"></main>
+<footer>Educational use only. Not financial advice. Trading involves substantial risk of loss. All sample figures are DEMO DATA, not real market prices.</footer>
+<script>
+const T=[
+["Fundamentals","What is trading","Buying and selling assets to profit from price changes over short to medium periods.","Buy EURUSD at 1.0800, sell at 1.0850 = 50 pips gain (illustrative).","Treating trading as gambling with no plan.","Is trading the same as long-term investing?","No. Trading is shorter-term and rule-driven."],
+["Fundamentals","Financial markets","Venues where assets (stocks, currencies, commodities, crypto) are exchanged between buyers and sellers.","Price rises when buyers outnumber sellers at a level.","Trading a market you do not understand.","What moves price?","Supply and demand (order flow)."],
+["Fundamentals","Forex, Indian stocks, crypto","Forex trades currency pairs 24/5; Indian stocks (NSE/BSE) trade ~9:15-15:30 IST; crypto trades 24/7 with high volatility.","Nifty 50 is Indias benchmark index; BTC trades any time.","Ignoring each markets hours and liquidity.","Which market runs 24/7?","Crypto."],
+["Fundamentals","Futures and CFDs","Futures are standardised contracts on an exchange; CFDs are broker contracts tracking price without owning the asset.","Both allow long and short positions with leverage.","Using high leverage without understanding margin calls.","Do CFDs give ownership of the asset?","No."],
+["Fundamentals","Sessions and participants","Asia, London and New York sessions have different volatility. Participants: retail, banks, funds, market makers.","London-New York overlap is usually the most active.","Trading dead hours with wide spreads.","Which overlap is busiest in forex?","London-New York."],
+["Fundamentals","Bid, ask, spread, leverage, margin","Bid = price to sell, ask = price to buy. Spread = ask - bid (your cost). Leverage multiplies exposure; margin is the deposit held.","1:100 leverage: $1,000 controls $100,000 notional. A 1% move against you wipes the account.","Maxing leverage.","What is the spread?","Ask minus bid."],
+["Technical","Candlestick patterns","Each candle shows open, high, low, close. Patterns like engulfing, pin bar and doji signal momentum or rejection.","A long lower wick at support shows buyers rejecting lower prices.","Trading patterns in the middle of nowhere.","What does a long wick show?","Rejection of that price."],
+["Technical","Support and resistance","Zones where price repeatedly stalls or reverses. Draw zones, not exact lines.","Price bounces off 100 three times, then breaks above.","Drawing too many levels.","What is broken support often called?","New resistance (role reversal)."],
+["Technical","Trendlines and market structure","Uptrend = higher highs (HH) and higher lows (HL). Downtrend = lower highs (LH) and lower lows (LL).","Connect two or more swing lows; a third touch confirms the line.","Forcing a line through candle bodies and wicks randomly.","Uptrend structure?","HH and HL."],
+["Technical","BOS, MSS and CHOCH","Break of Structure (BOS) continues the trend. Market Structure Shift (MSS) / Change of Character (CHOCH) is the first break against the trend, hinting at reversal.","In an uptrend, a close below the last higher low is a CHOCH.","Using wicks instead of candle closes to confirm.","Which signals possible reversal?","CHOCH / MSS."],
+["Technical","Premium, discount and Fibonacci","Split a range at 50%: above is premium (sell zone), below is discount (buy zone). Fib retracement levels 0.5-0.786 mark pullback zones.","Range 100-200: buying near 130 (discount) beats buying at 180.","Buying in premium in an uptrend.","Where do buyers prefer to enter?","Discount."],
+["ICT & SMC","Smart Money Concepts","SMC views price as engineered to collect liquidity before moving to the real direction.","Price spikes above a high, then reverses sharply.","Treating it as magic; it still needs rules and risk limits.","What does smart money seek?","Liquidity."],
+["ICT & SMC","Liquidity: BSL, SSL, equal highs/lows","Buy Side Liquidity (BSL) rests above highs (buy stops). Sell Side Liquidity (SSL) rests below lows. Equal highs/lows are obvious pools.","Equal highs at 150 attract a sweep above 150.","Entering before the sweep happens.","Where sits BSL?","Above highs."],
+["ICT & SMC","Liquidity sweeps and inducement","A sweep takes liquidity then reverses. Inducement is a minor trap level that baits early entries.","Price wicks above equal highs and closes back below.","Mistaking a real breakout for a sweep: wait for the close.","Sweep sign?","Wick beyond level, close back inside."],
+["ICT & SMC","Order Blocks (OB)","The last opposite candle before a strong displacement move. Price often returns to it.","Last down candle before a big rally = bullish OB.","Trading every OB without higher-timeframe context.","What is bullish OB?","Last down candle before strong up move."],
+["ICT & SMC","Fair Value Gaps and imbalances","A 3-candle gap where candle 1 and 3 wicks do not overlap. Price often rebalances it.","Gap between candle 1 high and candle 3 low = bullish FVG.","Treating every gap as an entry.","FVG needs how many candles?","Three."],
+["ICT & SMC","Displacement, breakers, mitigation","Displacement = strong impulsive move. A breaker is a failed OB that flips role. A mitigation block forms after a failed swing.","Bullish OB fails, price closes below it: it becomes a bearish breaker.","Ignoring displacement: weak moves are weak signals.","What is a breaker?","A failed order block that flips role."],
+["ICT & SMC","Dealing range, PDH/PDL, PWH/PWL, DOL","Dealing range is the current swing high-low. Previous Day/Week High/Low are key liquidity. Draw on Liquidity (DOL) is the level price is targeting.","Bias: price is likely drawn to PDH if it is untouched.","Ignoring the higher-timeframe draw.","What is DOL?","The liquidity level price is aiming for."],
+["Strategies","Price action, EMA 20/50, multi-timeframe","Trade structure and candles. EMA 20 above EMA 50 = bullish trend filter. Mark bias on higher timeframe (H4/D1), entry on lower (M15/H1).","Bias bullish on H4, buy a pullback to the 20 EMA on M15.","Using lower-timeframe signals against the higher trend.","Why use multi-timeframe?","To trade in the direction of the larger trend."],
+["Strategies","Entries, stop-loss, take-profit","Confirm with structure shift or candle close. Stop goes beyond invalidation, not at a random distance. Targets sit at next liquidity or 2R+.","Entry 100, stop 98, target 106 = 3R.","Moving the stop wider after entry.","Where goes the stop?","Beyond the invalidation level."],
+["Risk","Risk-to-reward, position size, drawdown","R:R = reward / risk. Risk 0.5-1% per trade. Position size = risk amount / stop distance. Set daily and max drawdown limits.","$10,000 account, 1% risk = $100 per trade.","Risking more after losses.","Position size formula?","Risk amount / stop distance."],
+["Risk","Capital management","Protect capital first. Cut size during drawdown, scale up slowly in profit.","Hit 3% daily loss: stop trading for the day.","No daily loss limit.","What to do at daily limit?","Stop trading."],
+["Psychology","Discipline, patience, emotional control","Follow your plan every trade. Waiting for A+ setups is a skill. Journal emotions.","Skipped a trade outside your plan = a win.","Trading to feel busy.","Best habit?","Follow the plan and journal."],
+["Psychology","Fear, greed, FOMO","Fear closes winners early; greed oversizes; FOMO chases moves. All come from lack of a defined edge and risk.","Missed move? Wait for the next setup.","Chasing candles already extended.","Cure for FOMO?","Predefined plan and small risk."],
+["Psychology","Revenge trading, overtrading, Mark Douglas","Revenge trading tries to win back losses. Douglas: think in probabilities, accept risk, treat each trade as one of many.","After 2 losses, step away 30 minutes.","Doubling size after a loss.","Douglas core idea?","Think in probabilities; anything can happen."]];
+const CATS=[...new Set(T.map(t=>t[0]))];
+const BOOKS=[["Trading in the Zone","Mark Douglas","Probabilistic thinking and mindset."],["The Disciplined Trader","Mark Douglas","Discipline and emotional mastery."],["Best Loser Wins","Tom Hougaard","Handling losses and ego."],["Technical Analysis of the Financial Markets","John J. Murphy","The classic technical reference."],["The Psychology of Money","Morgan Housel","Behaviour and long-term wealth."]];
+const PAGES=["Dashboard","Learn","Risk Tools","Journal","Analytics","Backtest","Books","Roadmap"];
+let S={done:{},trades:[],bt:[],books:{},goals:{},cat:"Fundamentals"};
+try{Object.assign(S,JSON.parse(localStorage.getItem("vta")||"{}"))}catch(e){}
+const save=()=>{try{localStorage.setItem("vta",JSON.stringify(S))}catch(e){}};
+const $=s=>document.querySelector(s),M=$("#main");let ch=[],page="Dashboard";
+const f=n=>(+n).toLocaleString(undefined,{maximumFractionDigits:2});
+const pnlc=n=>n>=0?"g":"r";
+function stats(){const t=S.trades,w=t.filter(x=>x.pnl>0),l=t.filter(x=>x.pnl<0);
+const gw=w.reduce((a,x)=>a+x.pnl,0),gl=Math.abs(l.reduce((a,x)=>a+x.pnl,0));
+return{n:t.length,w:w.length,l:l.length,wr:t.length?w.length/t.length*100:0,tot:t.reduce((a,x)=>a+x.pnl,0),aw:w.length?gw/w.length:0,al:l.length?gl/l.length:0,pf:gl?gw/gl:(gw?Infinity:0)}}
+function wk(d){const x=new Date(d);x.setDate(x.getDate()-((x.getDay()+6)%7));return x.toISOString().slice(0,10)}
+function group(fn){const o={};[...S.trades].sort((a,b)=>a.date>b.date?1:-1).forEach(t=>{const k=fn(t.date);o[k]=(o[k]||0)+t.pnl});return o}
+function chart(id,type,labels,data,label,col){ch.push(new Chart($(id),{type,data:{labels,datasets:[{label,data,borderColor:col||"#22e07a",backgroundColor:type=="bar"?data.map(v=>v>=0?"#22e07a99":"#ff5a5f99"):"#22e07a22",fill:type=="line",tension:.25}]},options:{responsive:true,plugins:{legend:{labels:{color:"#8a9b8f"}}},scales:{x:{ticks:{color:"#8a9b8f"},grid:{color:"#1b2a20"}},y:{ticks:{color:"#8a9b8f"},grid:{color:"#1b2a20"}}}}}))}
+function svg(seed){let p=100,c="",x=10;let r=seed*9301+49297;for(let i=0;i<22;i++){r=(r*9301+49297)%233280;const d=(r/233280-.42)*14,o=p,cl=p+d,hi=Math.max(o,cl)+4,lo=Math.min(o,cl)-4,col=d>=0?"#22e07a":"#ff5a5f";c+=`<line x1="${x}" x2="${x}" y1="${220-hi}" y2="${220-lo}" stroke="${col}"/><rect x="${x-4}" width="8" y="${220-Math.max(o,cl)}" height="${Math.max(2,Math.abs(d))}" fill="${col}"/>`;p=cl;x+=17}
+return `<svg viewBox="0 0 400 160"><g transform="translate(0,-60)">${c}</g><text x="8" y="152" fill="#8a9b8f" font-size="10">Illustration only (generated, not real price data)</text></svg>`}
+function show(p){page=p;ch.forEach(c=>c.destroy());ch=[];
+$("#nav").innerHTML=PAGES.map(x=>`<button class="${x==p?"on":""}" onclick="show('${x}')">${x}</button>`).join("");
+({Dashboard,Learn,"Risk Tools":Risk,Journal,Analytics,Backtest,Books,Roadmap})[p]();window.scrollTo(0,0)}
+function prog(){const d=T.filter(t=>S.done[t[1]]).length;return[d,T.length,d/T.length*100]}
+const GOALS=["Study 1 topic","Mark 1 chart","Journal 1 trade","Read 10 pages"];
+function Dashboard(){const[d,n,pc]=prog(),st=stats(),wkk=group(wk),tw=wkk[wk(new Date())]||0,td=new Date().toISOString().slice(0,10);
+const pend=T.filter(t=>!S.done[t[1]]).slice(0,5);
+M.innerHTML=`<h2>Dashboard</h2><div class="grid">
+<div class="card"><div class="m">Learning progress</div><div class="k">${f(pc)}%</div><div class="bar"><i style="width:${pc}%"></i></div><div class="m">${d} done / ${n-d} pending</div></div>
+<div class="card"><div class="m">This week P&L</div><div class="k ${pnlc(tw)}">${f(tw)}</div><div class="m">${st.n} trades logged</div></div>
+<div class="card"><div class="m">Win rate</div><div class="k">${f(st.wr)}%</div></div></div>
+<div class="grid"><div class="card"><h3>Daily goals</h3>${GOALS.map((g,i)=>`<label style="flex-direction:row;font-size:14px;color:var(--t)"><input type="checkbox" ${S.goals[td+i]?"checked":""} onchange="S.goals['${td}${i}']=this.checked;save()"> ${g}</label>`).join("")}</div>
+<div class="card"><h3>Next topics</h3>${pend.map(t=>`<div><a href="#" style="color:var(--t)" onclick="S.cat='${t[0]}';show('Learn');return false">${t[1]}</a></div>`).join("")||"All done!"}</div></div>
+<div class="card"><h3>Quick access</h3>${PAGES.slice(1).map(p=>`<button onclick="show('${p}')">${p}</button>`).join(" ")}</div>
+<div class="card"><h3>Weekly P&L</h3><canvas id="c1"></canvas></div>`;
+chart("#c1","bar",Object.keys(wkk),Object.values(wkk),"Weekly P&L")}
+function Learn(){M.innerHTML=`<h2>Trading Fundamentals to Psychology</h2><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${CATS.map(c=>`<button class="${c==S.cat?"on":""}" onclick="S.cat='${c}';Learn()">${c}</button>`).join("")}</div>`+
+T.map((t,i)=>[t,i]).filter(([t])=>t[0]==S.cat).map(([t,i])=>`<details><summary>${S.done[t[1]]?"✓ ":""}${t[1]}</summary>
+<p><b class="g">Definition / how it works:</b> ${t[2]}</p><p><b class="g">Example:</b> ${t[3]}</p>${svg(i+3)}
+<p><b class="r">Common mistake:</b> ${t[4]}</p><p><b class="g">Practice:</b> Find one example of "${t[1]}" on a chart and mark it. Write what you saw in your journal.</p>
+<p><b class="g">Quiz:</b> ${t[5]} <button onclick="this.outerHTML='<i class=g>${t[6].replace(/'/g,"")}</i>'">Show answer</button></p>
+<button class="pri" onclick="S.done['${t[1]}']=!S.done['${t[1]}'];save();Learn()">${S.done[t[1]]?"Completed ✓ (undo)":"Mark as completed"}</button></details>`).join("")}
+function Risk(){M.innerHTML=`<h2>Risk Tools</h2><div class="card"><h3>Position size / lot calculator</h3><form oninput="calc()"><label>Balance<input id="b" type="number" value="10000"></label><label>Risk %<input id="rp" type="number" value="1" step=".1"></label><label>Stop (pips/points)<input id="sp" type="number" value="20"></label><label>Value per pip per lot<input id="pv" type="number" value="10"></label><label>Reward ratio (R)<input id="rr" type="number" value="2"></label></form><p id="o1"></p></div>
+<div class="card"><h3>Compounding calculator</h3><form oninput="comp()"><label>Start capital<input id="sc" type="number" value="1000"></label><label>Return % / month<input id="rm" type="number" value="5"></label><label>Months<input id="mo" type="number" value="12"></label></form><p id="o2"></p><canvas id="c2"></canvas></div>
+<div class="card"><h3>Example</h3>$10,000, 1% risk = $100. Stop 20 pips at $10/pip/lot: lot = 100 / (20 x 10) = 0.5 lots. 2R target = $200. Ten losses in a row at 1% costs about 9.6%, which is survivable. Risking 10% per trade is not.</div>`;calc();comp()}
+function calc(){const v=i=>+$("#"+i).value,risk=v("b")*v("rp")/100,lot=risk/(v("sp")*v("pv")||1);$("#o1").innerHTML=`Risk: <b>$${f(risk)}</b> | Lot size: <b class="g">${f(lot)}</b> | Target at ${v("rr")}R: <b>$${f(risk*v("rr"))}</b>`}
+function comp(){const v=i=>+$("#"+i).value;let a=v("sc"),d=[a],l=[0];for(let i=1;i<=v("mo");i++){a*=1+v("rm")/100;d.push(a);l.push(i)}$("#o2").innerHTML=`Final: <b class="g">$${f(a)}</b> (hypothetical, not a promise)`;ch.forEach(c=>c.destroy());ch=[];chart("#c2","line",l,d,"Balance")}
+function Journal(){const F=[["date","Date","date"],["inst","Instrument","text"],["side","Side","select"],["entry","Entry","number"],["sl","Stop loss","number"],["tp","Take profit","number"],["risk","Risk %","number"],["pnl","Profit/Loss","number"],["strat","Strategy","text"],["shot","Screenshot URL","url"]];
+M.innerHTML=`<h2>Trading Journal</h2><div class="card"><form id="jf">${F.map(([k,n,t])=>t=="select"?`<label>${n}<select name="${k}"><option>Buy</option><option>Sell</option></select></label>`:`<label>${n}<input name="${k}" type="${t}" step="any" ${t=="number"?"":"" }></label>`).join("")}
+<label class="w">Reason for entering<textarea name="why" rows="2"></textarea></label><label>Mistakes<textarea name="mis" rows="2"></textarea></label><label>Lessons learned<textarea name="les" rows="2"></textarea></label>
+<button class="pri w" type="submit">Add trade</button></form></div>
+<div class="card"><button onclick="exp()">Export JSON</button> <label style="display:inline">Import <input type="file" accept=".json" onchange="imp(this)"></label> <button onclick="demo()">Load DEMO data</button> <button onclick="if(confirm('Delete all data?')){S.trades=[];S.bt=[];save();Journal()}">Clear</button></div>
+<div class="card tw"><table><tr><th>Date</th><th>Inst</th><th>Side</th><th>Entry</th><th>SL</th><th>TP</th><th>Risk%</th><th>P&L</th><th>Strategy</th><th>Notes</th><th></th></tr>${[...S.trades].map((t,i)=>[t,i]).reverse().map(([t,i])=>`<tr><td>${t.date}</td><td>${esc(t.inst)}${t.demo?' <span class="demo">DEMO</span>':""}</td><td>${t.side}</td><td>${t.entry||""}</td><td>${t.sl||""}</td><td>${t.tp||""}</td><td>${t.risk||""}</td><td class="${pnlc(t.pnl)}">${f(t.pnl)}</td><td>${esc(t.strat)}</td><td title="${esc(t.mis)} | ${esc(t.les)}">${esc(t.why)}</td><td><button onclick="S.trades.splice(${i},1);save();Journal()">x</button></td></tr>`).join("")}</table></div>`;
+$("#jf").onsubmit=e=>{e.preventDefault();const o=Object.fromEntries(new FormData(e.target));o.pnl=+o.pnl||0;if(!o.date)o.date=new Date().toISOString().slice(0,10);S.trades.push(o);save();Journal()}}
+const esc=s=>String(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function demo(){const d=new Date(),a=[120,-60,200,-60,90,-60,150,310,-60,-60,180,75];a.forEach((p,i)=>{const x=new Date(d-(a.length-i)*864e5*2);S.trades.push({date:x.toISOString().slice(0,10),inst:"DEMO-PAIR",side:i%2?"Sell":"Buy",risk:1,pnl:p,strat:i%3?"OB + FVG":"EMA pullback",why:"Demo entry",demo:1})});save();Journal()}
+function exp(){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:"application/json"}));a.download="vishnu-academy-backup.json";a.click()}
+function imp(i){const r=new FileReader();r.onload=()=>{try{Object.assign(S,JSON.parse(r.result));save();show(page)}catch(e){alert("Invalid file")}};r.readAsText(i.files[0])}
+function Analytics(){const s=stats();const K=[["Total trades",s.n],["Winning",s.w],["Losing",s.l],["Win rate",f(s.wr)+"%"],["Total P&L",f(s.tot)],["Avg win",f(s.aw)],["Avg loss",f(s.al)],["Profit factor",s.pf==Infinity?"inf":f(s.pf)],["Avg R:R",s.al?f(s.aw/s.al):"-"]];
+M.innerHTML=`<h2>Performance Analytics</h2>${S.trades.some(t=>t.demo)?'<span class="demo">Includes DEMO DATA</span>':""}<div class="grid" style="margin-top:10px">${K.map(([a,b])=>`<div class="card"><div class="m">${a}</div><div class="k">${b}</div></div>`).join("")}</div>
+<div class="card"><h3>Equity curve</h3><canvas id="c1"></canvas></div><div class="grid"><div class="card"><h3>Weekly</h3><canvas id="c2"></canvas></div><div class="card"><h3>Monthly</h3><canvas id="c3"></canvas></div></div>`;
+let e=0;const t=[...S.trades].sort((a,b)=>a.date>b.date?1:-1);chart("#c1","line",t.map(x=>x.date),t.map(x=>e+=x.pnl),"Equity");
+const w=group(wk),m=group(d=>d.slice(0,7));chart("#c2","bar",Object.keys(w),Object.values(w),"Weekly");chart("#c3","bar",Object.keys(m),Object.values(m),"Monthly")}
+function Backtest(){M.innerHTML=`<h2>Backtesting Lab</h2><div class="card"><form id="bf"><label>Strategy<input name="s" required></label><label>Instrument<input name="i"></label><label>Timeframe<input name="tf"></label><label>Trades tested<input name="n" type="number"></label><label>Win rate %<input name="w" type="number" step="any"></label><label>Avg R:R<input name="r" type="number" step="any"></label><label class="w">Results / notes<textarea name="no" rows="2"></textarea></label><button class="pri w">Save test</button></form></div>
+<div class="card tw"><table><tr><th>Strategy</th><th>Inst</th><th>TF</th><th>Trades</th><th>Win%</th><th>R:R</th><th>Expectancy (R)</th><th>Notes</th><th></th></tr>${S.bt.map((b,i)=>{const ex=b.w/100*b.r-(1-b.w/100);return`<tr><td>${esc(b.s)}</td><td>${esc(b.i)}</td><td>${esc(b.tf)}</td><td>${b.n}</td><td>${b.w}</td><td>${b.r}</td><td class="${pnlc(ex)}">${f(ex)}</td><td>${esc(b.no)}</td><td><button onclick="S.bt.splice(${i},1);save();Backtest()">x</button></td></tr>`}).join("")}</table></div>
+<div class="card"><h3>Strategy comparison (expectancy per trade in R)</h3><canvas id="c1"></canvas></div><p class="m">Expectancy = win% x R:R - loss%. Enter your own results.</p>`;
+$("#bf").onsubmit=e=>{e.preventDefault();const o=Object.fromEntries(new FormData(e.target));["n","w","r"].forEach(k=>o[k]=+o[k]||0);S.bt.push(o);save();Backtest()};
+chart("#c1","bar",S.bt.map(b=>b.s),S.bt.map(b=>b.w/100*b.r-(1-b.w/100)),"Expectancy R")}
+function Books(){M.innerHTML=`<h2>Trading Library</h2><div class="grid">${BOOKS.map((b,i)=>`<div class="card"><h3>${b[0]}</h3><div class="m">${b[1]}</div><p>${b[2]}</p><select onchange="S.books[${i}]=this.value;save()">${["To read","Reading","Finished"].map(o=>`<option ${S.books[i]==o?"selected":""}>${o}</option>`).join("")}</select></div>`).join("")}</div><p class="m">Buy or borrow legally; this library only tracks your reading.</p>`}
+function Roadmap(){const L=[["Beginner",["Fundamentals"]],["Intermediate",["Technical","Risk"]],["Advanced",["ICT & SMC","Strategies","Psychology"]]];
+M.innerHTML=`<h2>Learning Roadmap</h2>`+L.map(([n,cs],k)=>{const ts=T.filter(t=>cs.includes(t[0])),d=ts.filter(t=>S.done[t[1]]).length;return`<div class="card"><h3>Stage ${k+1}: ${n}</h3><div class="bar"><i style="width:${d/ts.length*100}%"></i></div><p class="m">${d}/${ts.length} complete</p>${cs.map(c=>`<button onclick="S.cat='${c}';show('Learn')">${c}</button>`).join(" ")}</div>`}).join("")}
+show("Dashboard");
+</script></body></html>
